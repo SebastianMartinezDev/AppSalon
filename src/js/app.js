@@ -1,5 +1,12 @@
 let pagina = 1;
 
+const cita = {
+    nombre:'',
+    fecha:'',
+    hora:'',
+    servicios:[]
+}
+
 document.addEventListener('DOMContentLoaded', function(){
     iniciarApp();
 });
@@ -19,6 +26,9 @@ function iniciarApp(){
 
     //Mostrar y Ocultar botones de paginación
     botonesPaginador();
+
+    // Valida información de la cita y muestra resumen o mensaje de error
+    mostrarResumen();
 };
 
 function mostraSeccion(){
@@ -113,9 +123,36 @@ function seleccionarServicio(e){
     //Selecciona o deselecciona el elemento
     if(elemento.classList.contains('seleccionado')){
         elemento.classList.remove('seleccionado');
+
+        const id = parseInt(elemento.dataset.idServicio);
+
+        //Elimina servicio de la cita
+        eliminarServicio(id);
     }else{
         elemento.classList.add('seleccionado');
+
+        const servicioObj = {
+            id: parseInt(elemento.dataset.idServicio),
+            nombre: elemento.firstElementChild.textContent,
+            precio: elemento.firstElementChild.nextElementSibling.textContent
+        }
+        //console.log(servicioObj);
+
+        //Agrega servicio a la cita
+        agregarServicio(servicioObj);
     }
+}
+
+function eliminarServicio(id){
+    const {servicios} = cita;
+    cita.servicios = servicios.filter(servicio => servicio.id !== id);
+    console.log(cita);
+}
+
+function agregarServicio(servicioObj){
+    const {servicios} = cita;
+    cita.servicios = [...servicios, servicioObj];
+    console.log(cita);
 }
 
 function paginaSiguiente(){
@@ -123,7 +160,6 @@ function paginaSiguiente(){
     paginaSiguiente.addEventListener('click', () => {
         pagina++;
         botonesPaginador();
-        console.log(pagina);
     });
 }
 
@@ -132,7 +168,6 @@ function paginaAnterior(){
     paginaAnterior.addEventListener('click', () => {
         pagina--;
         botonesPaginador();
-        console.log(pagina);
     });
 }
 
@@ -151,4 +186,23 @@ function botonesPaginador(){
         paginaAnterior.classList.remove('ocultar');
     }
     mostraSeccion();
+}
+
+function mostrarResumen(){
+    //Destructuring
+    const{nombre, fecha, hora, servicios} = cita;
+
+    //
+    const resumenDiv = document.querySelector('.contenido-resumen');
+
+    //Validación de datos
+    if(Object.values(cita).includes('')){
+        const noServicios = document.createElement('P');
+        noServicios.textContent = 'Faltan Datos de Servicios, nombre, fecha u hora';
+        noServicios.classList.add('invalidar-cita');
+        
+        //Agregar a ResumenDiv
+        resumenDiv.appendChild(noServicios);
+
+    }
 }
