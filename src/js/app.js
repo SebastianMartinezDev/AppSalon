@@ -27,8 +27,17 @@ function iniciarApp(){
     //Mostrar y Ocultar botones de paginación
     botonesPaginador();
 
-    // Valida información de la cita y muestra resumen o mensaje de error
+    //Valida información de la cita y muestra resumen o mensaje de error
     mostrarResumen();
+
+    //Almacena el nombre de la cita
+    nombreCita();
+
+    //Almacena el fecha de la cita
+    fechaCita();
+
+    //Deshabilita días pasados
+    deshabilitarFechaAnterior();
 };
 
 function mostraSeccion(){
@@ -203,6 +212,73 @@ function mostrarResumen(){
         
         //Agregar a ResumenDiv
         resumenDiv.appendChild(noServicios);
-
     }
+}
+
+function nombreCita(){
+    const nombreInput = document.querySelector('#nombre');
+    
+    nombreInput.addEventListener('input', e => {
+        const nombreTexto = e.target.value.trim();
+
+        //Validación de que nombreTexto no esté vacío
+        if (nombreTexto === '' || nombreTexto.length < 3){
+            mostrarAlerta('Nombre no Válido','error');
+        } else{
+            const alerta = document.querySelector('.alerta');
+            if(alerta){
+                alerta.remove();
+            }
+            cita.nombre = nombreTexto;
+        }
+    });
+}
+
+function mostrarAlerta(mensaje,tipo){
+
+    //Si ya hay alerta, no crear otra
+    const alertaPrevia = document.querySelector('.alerta');
+    if(alertaPrevia){
+        return;
+    }
+    const alerta = document.createElement('DIV');
+    alerta.textContent = mensaje;
+    alerta.classList.add('alerta');
+    if(tipo === 'error'){
+        alerta.classList.add('error')
+    }
+    //Insertar alerta al HTML
+    document.querySelector('.formulario').appendChild(alerta);
+
+    //Temporizado de alerta
+    setTimeout(() => {
+        alerta.remove();
+    }, 3000);
+}
+
+function fechaCita(){
+    const fechaInput = document.querySelector('#fecha');
+    fechaInput.addEventListener('input', e => {
+        const dia = new Date(e.target.value).getUTCDay();
+
+        if([0,6].includes(dia)){
+            e.preventDefault();
+            fechaInput.value = '';
+            mostrarAlerta('Sábados y Domingos cerrado','error')
+        } else{
+            cita.fecha = fechaInput.value;
+        }
+    });
+}
+
+function deshabilitarFechaAnterior(){
+    const inputFecha = document.querySelector('#fecha');
+    const fechaAhora = new Date();
+    const year = fechaAhora.getFullYear();
+    const mes = fechaAhora.getMonth()+1;
+    const dia = fechaAhora.getDate()+1;
+
+    //Formato deseado YYYY-MM-DD
+    const fechaDeshabilitar = `${year}-${mes}-${dia}`;
+    inputFecha.min = fechaDeshabilitar;
 }

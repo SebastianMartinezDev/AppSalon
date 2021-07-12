@@ -18,3 +18,16 @@
         }
     }
 }
+
+.alerta{
+    padding: $separacion/5;
+    text-align: center;
+    color: $blanco;
+    width: 100%;
+    display: block;
+    font-size: 2rem;
+
+    &.error{
+        background-color: rgb(194,0,0);
+    }
+}
